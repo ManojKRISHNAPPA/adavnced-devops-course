@@ -1,1 +1,0 @@
-# adavnced-devops-course
