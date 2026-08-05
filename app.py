@@ -4,3 +4,5 @@ print("this line of code is update by Hadi and this original code from github an
 
 
 print("Hello am  manoj working on local .. now am trying to push the changes to remote repo.. ")
+
+print("this is to show how from cli")
