@@ -29,7 +29,14 @@ pipeline{
                     echo "pushing docker image"
                 '''
             }
-        }        
+        }    
+        stage('cleanup'){
+            steps{
+                sh '''
+                    echo "cleaning up docker image"
+                '''
+            }
+        }
     }
 }
 
