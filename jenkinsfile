@@ -4,7 +4,7 @@ pipeline{
     stages{
         stage('gitcheckout'){
             steps{
-                    git branch:'DEV' url: 'https://github.com/ManojKRISHNAPPA/adavnced-devops-course.git'
+                    git branch:'DEV', url: 'https://github.com/ManojKRISHNAPPA/adavnced-devops-course.git'
             }
             
         }
