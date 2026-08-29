@@ -20,6 +20,8 @@ pipeline{
         stage('Building container'){
             steps{
                 sh '''
+                docker stop c1
+                docker rm c1
                 docker run -it -d --name c1 -p 9000:8501 chatbot:1
                 '''
             }

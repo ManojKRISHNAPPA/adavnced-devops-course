@@ -28,7 +28,8 @@ with st.sidebar:
         "Select Model",
         [
             "openai/gpt-oss-120b",
-            "qwen/qwen3.8-27b"
+            "qwen/qwen3.8-27b",
+            "meta-llama/llama-prompt-guard-2-22m"
         ]
     )
 
