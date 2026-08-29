@@ -1,6 +1,11 @@
 pipeline{
     agent any
 
+    environment{
+        IMAGE_NAME = "manojkrishnapp/chatbot:${GIT_COMMIT}"
+    }
+
+
     stages{
         stage('gitcheckout'){
             steps{
@@ -12,7 +17,8 @@ pipeline{
         stage('docker build'){
             steps{
                 sh '''
-                    docker build -t chatbot:1 .
+                    printenv
+                    docker build -t ${IMAGE_NAME} .
                 '''
             }
         }
