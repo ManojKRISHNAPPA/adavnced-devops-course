@@ -1,0 +1,36 @@
+pipeline{
+    agent any
+
+    environment{
+        IMAGE_NAME = "manojkrishnapp/chatbot:${GIT_COMMIT}"
+    }
+
+
+    stages{
+        stage('gitcheckout'){
+            steps{
+                    git branch:'DEV', url: 'https://github.com/ManojKRISHNAPPA/adavnced-devops-course.git'
+            }
+            
+        }
+
+        stage('docker build'){
+            steps{
+                sh '''
+                    printenv
+                    docker build -t ${IMAGE_NAME} .
+                '''
+            }
+        }
+
+        stage('Building container'){
+            steps{
+                sh '''
+                docker stop c1
+                docker rm c1
+                docker run -it -d --name c1 -p 9000:8501 chatbot:1
+                '''
+            }
+        }
+    }
+}
