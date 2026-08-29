@@ -1,0 +1,28 @@
+pipeline{
+    agent any
+
+    stages{
+        stage('gitcheckout'){
+            steps{
+                sh '''
+                    git url: 'https://github.com/ManojKRISHNAPPA/adavnced-devops-course.git',branch:'DEV'
+                '''
+            }
+            
+        }
+
+        stage('docker build'){
+            steps{
+                sh '''
+                    docker build -t chatbot:1 .
+                '''
+            }
+        }
+
+        stage('Building container'){
+            steps{
+                docker run -it -d --name c1 -p 9000:8501 chatbot:1
+            }
+        }
+    }
+}
