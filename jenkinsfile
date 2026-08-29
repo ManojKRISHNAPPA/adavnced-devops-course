@@ -23,15 +23,15 @@ pipeline{
             }
         }
 
-        stage('Building container'){
-            steps{
-                sh '''
-                docker stop ${IMAGE_NAME}
-                docker rm ${IMAGE_NAME}
-                docker run -it -d --name c1 -p 9000:8501 ${IMAGE_NAME}
-                '''
-            }
-        }
+        // stage('Building container'){
+        //     steps{
+        //         sh '''
+        //         docker stop ${IMAGE_NAME}
+        //         docker rm ${IMAGE_NAME}
+        //         docker run -it -d --name c1 -p 9000:8501 ${IMAGE_NAME}
+        //         '''
+        //     }
+        // }
 
         stage('docker login stage'){
             steps{
