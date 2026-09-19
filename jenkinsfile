@@ -1,0 +1,76 @@
+pipeline{
+    agent any
+
+    environment{
+        IMAGE_NAME = "manojkrishnappa/chatbot:${GIT_COMMIT}"
+        EKS_CLUSTER_NAME = "shab-cluster"
+        AWS_REGION = "ap-northeast-1"
+    }
+
+
+    stages{
+        stage('gitcheckout'){
+            steps{
+                    git branch:'DEV', url: 'https://github.com/ManojKRISHNAPPA/adavnced-devops-course.git'
+            }
+            
+        }
+
+        stage('docker build'){
+            steps{
+                sh '''
+                    printenv
+                    docker build -t ${IMAGE_NAME} .
+                '''
+            }
+        }
+
+        // stage('Building container'){
+        //     steps{
+        //         sh '''
+        //         docker stop ${IMAGE_NAME}
+        //         docker rm ${IMAGE_NAME}
+        //         docker run -it -d --name c1 -p 9000:8501 ${IMAGE_NAME}
+        //         '''
+        //     }
+        // }
+
+
+        stage('Login to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'docker-hub-cred',
+                    usernameVariable: 'DOCKER_USERNAME',
+                    passwordVariable: 'DOCKER_PASSWORD'
+                )]) {
+                    sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
+                }
+            }
+        }
+        stage('uploading docker image to dockerhub'){
+            steps{
+                sh '''
+                    docker push ${IMAGE_NAME}
+                '''
+            }
+        }
+
+        stage('update-kubeconfig'){
+            steps{
+                sh '''
+                    aws eks update-kubeconfig --region ${AWS_REGION} --name ${EKS_CLUSTER_NAME}
+                '''
+            }
+        }
+        stage('deploy to kubernetes'){
+            steps{
+                withKubeConfig(caCertificate: '', clusterName: 'shab-cluster', contextName: '', credentialsId: 'kube', namespace: 'default', restrictKubeConfigAccess: false, serverUrl: 'https://747F3358BB1CD6AFD09AD21737361797.gr7.ap-northeast-1.eks.amazonaws.com') {
+                    sh '''
+                        sed -i "s|replace|${IMAGE_NAME}|g" Deployment.yaml
+                        kubectl apply -f Deployment.yaml
+                    '''
+                }
+            }
+        }
+    }
+}
