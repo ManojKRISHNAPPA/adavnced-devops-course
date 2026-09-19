@@ -3,6 +3,8 @@ pipeline{
 
     environment{
         IMAGE_NAME = "manojkrishnappa/chatbot:${GIT_COMMIT}"
+        EKS_CLUSTER_NAME = "shab-cluster"
+        AWS_REGION = "ap-northeast-1"
     }
 
 
@@ -49,6 +51,21 @@ pipeline{
             steps{
                 sh '''
                     docker push ${IMAGE_NAME}
+                '''
+            }
+        }
+
+        stage('update-kubeconfig'){
+            steps{
+                sh '''
+                    aws eks update-kubeconfig --region ${AWS_REGION} --name ${EKS_CLUSTER_NAME}
+                '''
+            }
+        }
+        stage('deploy to kubernetes'){
+            steps{
+                sh '''
+                    kubectl apply -f Deployment.yaml
                 '''
             }
         }
