@@ -2,9 +2,63 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: jenkins-role
+  namespace: default
+
 rules:
+# Core API resources
 - apiGroups: [""]
-  resources: ["pods", "services", "deployments", "configmaps", "secrets", "persistentvolumeclaims", "statefulsets", "jobs", "ingresses"]
-  verbs: ["get", "list", "watch", "create", "delete"]
+  resources:
+    - pods
+    - services
+    - configmaps
+    - secrets
+    - persistentvolumeclaims
+  verbs:
+    - get
+    - list
+    - watch
+    - create
+    - update
+    - patch
+    - delete
 
+# Apps API resources
+- apiGroups: ["apps"]
+  resources:
+    - deployments
+    - statefulsets
+    - replicasets
+  verbs:
+    - get
+    - list
+    - watch
+    - create
+    - update
+    - patch
+    - delete
 
+# Batch API resources
+- apiGroups: ["batch"]
+  resources:
+    - jobs
+  verbs:
+    - get
+    - list
+    - watch
+    - create
+    - update
+    - patch
+    - delete
+
+# Networking API resources
+- apiGroups: ["networking.k8s.io"]
+  resources:
+    - ingresses
+  verbs:
+    - get
+    - list
+    - watch
+    - create
+    - update
+    - patch
+    - delete
