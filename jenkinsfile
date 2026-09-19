@@ -66,6 +66,7 @@ pipeline{
             steps{
                 withKubeConfig(caCertificate: '', clusterName: 'shab-cluster', contextName: '', credentialsId: 'kube', namespace: 'default', restrictKubeConfigAccess: false, serverUrl: 'https://747F3358BB1CD6AFD09AD21737361797.gr7.ap-northeast-1.eks.amazonaws.com') {
                     sh '''
+                        sed -i 's|replace|${IMAGE_NAME}|g' Deployment.yaml
                         kubectl apply -f Deployment.yaml
                     '''
                 }
