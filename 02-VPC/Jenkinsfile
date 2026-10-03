@@ -1,0 +1,58 @@
+pipeline{
+    parameters{
+        choice(name: 'terraformAction', choices: ['apply', 'destroy'], description: 'Select the environment to deploy')
+    }
+
+    environment {
+        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+    }
+
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'terraform', url: 'https://github.com/ManojKRISHNAPPA/adavnced-devops-course.git'
+            }
+        }
+    }
+
+    stages{
+        stage('Terraform Init'){
+            steps{
+                sh '''
+                cd 02-VPC
+                terraform init
+                '''
+            }
+        }
+
+        stage('Terraform Plan'){
+            steps{
+                sh '''
+                cd 02-VPC
+                terraform plan
+                '''
+            }
+        }
+
+        stage('Terraform Apply/Destroy'){
+            steps{
+                script {
+                    if (params.terraformAction == 'apply') {
+                        sh '''
+                        cd 02-VPC
+                        terraform apply -auto-approve
+                        '''
+                    } else if (params.terraformAction == 'destroy') {
+                        sh '''
+                        cd 02-VPC
+                        terraform destroy -auto-approve
+                        '''
+                    }
+                }
+            }
+        }
+    }
+}
