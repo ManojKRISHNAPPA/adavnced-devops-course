@@ -10,15 +10,13 @@ pipeline{
 
     agent any
 
-    stages {
+    stages{
         stage('Checkout') {
             steps {
                 git branch: 'terraform', url: 'https://github.com/ManojKRISHNAPPA/adavnced-devops-course.git'
             }
         }
-    }
-
-    stages{
+        
         stage('Terraform Init'){
             steps{
                 sh '''
