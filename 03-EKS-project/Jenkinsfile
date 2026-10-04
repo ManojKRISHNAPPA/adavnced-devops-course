@@ -133,7 +133,6 @@ ok: 'Approve Bootstrap'
 
                     terraform init --input=false
 
-                    terraform import aws_s3_bucket.tf_state shab-terraform-backup || true
 
                     terraform plan \
                         --input=false \
@@ -213,7 +212,7 @@ ok: 'Approve Networking'
 
                     terraform init --input=false
 
-                    terraform import aws_s3_bucket.tf_state shab-terraform-backup || true
+
 
                     terraform plan \
                         --input=false \
