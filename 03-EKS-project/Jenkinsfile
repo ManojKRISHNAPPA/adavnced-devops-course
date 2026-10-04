@@ -31,7 +31,7 @@ pipeline {
         //---apply stages
 
         stage('01-Bootstrap'){
-            when {expression {parms.terraform_action == 'apply'}}
+            when {expression {params.terraform_action == 'apply'}}
             steps{
                 sh '''
                 cd terraform/03-EKS-project/01-Bootstrap  
@@ -44,7 +44,7 @@ pipeline {
         }
 
         stage('approval:01-Bootstrap'){
-            when {expression {parms.terraform_action == 'apply'}}
+            when {expression {params.terraform_action == 'apply'}}
             steps{
                 script {
                     def plan = readFile 'terraform/03-EKS-project/01-Bootstrap/tfplan.txt'
@@ -55,7 +55,7 @@ pipeline {
         }
 
         stage('Creation: 01-bootstrap'){
-              when {expression {parms.terraform_action == 'apply'}}
+              when {expression {params.terraform_action == 'apply'}}
               steps{
                 sh'''
                 cd terraform/03-EKS-project/01-Bootstrap/
@@ -65,7 +65,7 @@ pipeline {
         }
 
         stage('02-Networking'){
-            when {expression {parms.terraform_action == 'apply'}}
+            when {expression {params.terraform_action == 'apply'}}
             steps{
                 sh '''
                 cd terraform/03-EKS-project/02-Networking
@@ -78,7 +78,7 @@ pipeline {
         }
 
         stage('approval:02-Networking'){
-            when {expression {parms.terraform_action == 'apply'}}
+            when {expression {params.terraform_action == 'apply'}}
             steps{
                 script {
                     def plan = readFile 'terraform/03-EKS-project/02-Networking/tfplan.txt'
@@ -89,7 +89,7 @@ pipeline {
         }
 
         stage('Creation: 02-Networking'){
-              when {expression {parms.terraform_action == 'apply'}}
+              when {expression {params.terraform_action == 'apply'}}
               steps{
                 sh'''
                 cd terraform/03-EKS-project/02-Networking
@@ -99,7 +99,7 @@ pipeline {
         }
 
         stage('03-EKS'){
-            when {expression {parms.terraform_action == 'apply'}}
+            when {expression {params.terraform_action == 'apply'}}
             steps{
                 sh '''
                 cd terraform/03-EKS-project/03-EKS
@@ -112,7 +112,7 @@ pipeline {
         }
 
         stage('approval:03-EKS'){
-            when {expression {parms.terraform_action == 'apply'}}
+            when {expression {params.terraform_action == 'apply'}}
             steps{
                 script {
                     def plan = readFile 'terraform/03-EKS-project/03-EKS/tfplan.txt'
@@ -123,7 +123,7 @@ pipeline {
         }
 
         stage('Creation: 03-EKS'){
-            when {expression {parms.terraform_action == 'apply'}}
+            when {expression {params.terraform_action == 'apply'}}
               steps{
                 sh'''
                 cd terraform/03-EKS-project/03-EKS
@@ -135,7 +135,7 @@ pipeline {
 // --destroy stage
 
         stage('Destroying EKS'){
-            when {expression {parms.terraform_action == 'destroy'}}
+            when {expression {params.terraform_action == 'destroy'}}
             steps {
                 sh '''
                    cd terraform/03-EKS-project/03-EKS/
@@ -145,7 +145,7 @@ pipeline {
             }
         }
         stage('Destroying network'){
-            when {expression {parms.terraform_action == 'destroy'}}
+            when {expression {params.terraform_action == 'destroy'}}
             steps {
                 sh '''
                    cd terraform/03-EKS-project/02-Networking
@@ -155,7 +155,7 @@ pipeline {
             }
         }
         stage('Destroying bootstrap'){
-            when {expression {parms.terraform_action == 'destroy'}}
+            when {expression {params.terraform_action == 'destroy'}}
             steps {
                 sh '''
                    cd terraform/03-EKS-project/01-Bootstrap
