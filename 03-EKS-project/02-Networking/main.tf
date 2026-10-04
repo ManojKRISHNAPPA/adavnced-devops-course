@@ -1,16 +1,6 @@
-```hcl
-# ============================================================
-# Availability Zones
-# ============================================================
-
 data "aws_availability_zones" "available" {
   state = "available"
 }
-
-
-# ============================================================
-# Locals
-# ============================================================
 
 locals {
   azs = var.azs
@@ -19,7 +9,6 @@ locals {
     Project = var.project_name
   }
 }
-
 
 # ============================================================
 # VPC
@@ -35,10 +24,8 @@ resource "aws_vpc" "main" {
   })
 }
 
-
 # ============================================================
 # Public Subnets
-# Used for ALB and NAT Gateway
 # ============================================================
 
 resource "aws_subnet" "public" {
@@ -54,10 +41,8 @@ resource "aws_subnet" "public" {
   })
 }
 
-
 # ============================================================
 # Private Subnets
-# Used for EKS Worker Nodes
 # ============================================================
 
 resource "aws_subnet" "private" {
@@ -77,7 +62,6 @@ resource "aws_subnet" "private" {
   })
 }
 
-
 # ============================================================
 # Internet Gateway
 # ============================================================
@@ -89,7 +73,6 @@ resource "aws_internet_gateway" "main" {
     Name = "${var.project_name}-igw"
   })
 }
-
 
 # ============================================================
 # Public Route Table
@@ -103,10 +86,8 @@ resource "aws_route_table" "public" {
   })
 }
 
-
 # ============================================================
 # Public Route
-# Internet Gateway -> Internet
 # ============================================================
 
 resource "aws_route" "public" {
@@ -115,9 +96,8 @@ resource "aws_route" "public" {
   gateway_id             = aws_internet_gateway.main.id
 }
 
-
 # ============================================================
-# Public Route Table Associations
+# Public Route Table Association
 # ============================================================
 
 resource "aws_route_table_association" "public" {
@@ -126,7 +106,6 @@ resource "aws_route_table_association" "public" {
   subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.public.id
 }
-
 
 # ============================================================
 # Elastic IP for NAT Gateway
@@ -140,10 +119,8 @@ resource "aws_eip" "nat" {
   })
 }
 
-
 # ============================================================
 # NAT Gateway
-# Single NAT Gateway for all private subnets
 # ============================================================
 
 resource "aws_nat_gateway" "main" {
@@ -159,7 +136,6 @@ resource "aws_nat_gateway" "main" {
   ]
 }
 
-
 # ============================================================
 # Private Route Table
 # ============================================================
@@ -172,10 +148,8 @@ resource "aws_route_table" "private" {
   })
 }
 
-
 # ============================================================
 # Private Route
-# Private Subnets -> NAT Gateway -> Internet
 # ============================================================
 
 resource "aws_route" "private" {
@@ -184,9 +158,8 @@ resource "aws_route" "private" {
   nat_gateway_id         = aws_nat_gateway.main.id
 }
 
-
 # ============================================================
-# Private Route Table Associations
+# Private Route Table Association
 # ============================================================
 
 resource "aws_route_table_association" "private" {
