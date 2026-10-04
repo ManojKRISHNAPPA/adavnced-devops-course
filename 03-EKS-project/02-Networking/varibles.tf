@@ -13,5 +13,5 @@ variable "vpc_cidr" {
 variable "azs" {
   description = "Availability Zones"
   type        = list(string)
-  default     = ["ap-northeast-1a", "ap-northeast-1c"," ap-northeast-1d"]
+  default     = ["ap-northeast-1a", "ap-northeast-1c", "ap-northeast-1d"]
 }
