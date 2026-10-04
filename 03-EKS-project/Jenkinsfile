@@ -1,0 +1,167 @@
+pipeline {
+    parameters {
+        choice(
+            name: 'terraform_action',
+            choices: ['apply', 'destroy']
+            description: 'Choose the Terraform action to perform'
+        )
+    }
+    environment {
+        AWS_DEFAULT_REGION = 'ap-northeast-1'
+        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('aAWS_SECRET_ACCESS_KEY')
+    }
+
+    stages{
+        stage('checkout'){
+            steps {
+                script{
+                    dir('terraform'){
+                        git url : 'https://github.com/ManojKRISHNAPPA/adavnced-devops-course.git',
+                        branch: 'terraform'
+                    }
+                }
+            }
+        }
+
+        //---apply stages
+
+        stage('01-Bootstrap'){
+            when {expression {parms.terraform_action == 'apply'}}
+            steps{
+                sh '''
+                cd terraform/03-EKS-project/01-Bootstrap  
+                terraform init --input=false          
+                terraform import aws_s3_bucket.tf_state shab-terraform-backup || true
+                terraform plan -out tfplan
+                terraform show -no-color tfplan > tfplan.txt
+                '''
+            }
+        }
+
+        stage('approval:01-Bootstrap'){
+            when {expression {parms.terraform_action == 'apply'}}
+            steps{
+                script {
+                    def plan = readFile 'terraform/03-EKS-project/01-Bootstrap/tfplan.txt'
+                    input message: '[01-bootstrap] approve to proced'
+                        parameters: [text(name: 'Plan',description: 'terraform plan output', defaultValue: plan)]
+                }
+            }
+        }
+
+        stage('Creation: 01-bootstrap'){
+              when {expression {parms.terraform_action == 'apply'}}
+              steps{
+                sh'''
+                cd terraform/03-EKS-project/01-Bootstrap/
+                terraform apply --input=false tfplan
+                '''
+              }
+        }
+
+        stage('02-Networking'){
+            when {expression {parms.terraform_action == 'apply'}}
+            steps{
+                sh '''
+                cd terraform/03-EKS-project/02-Networking
+                terraform init --input=false          
+                terraform import aws_s3_bucket.tf_state shab-terraform-backup || true
+                terraform plan -out tfplan
+                terraform show -no-color tfplan > tfplan.txt
+                '''
+            }
+        }
+
+        stage('approval:02-Networking'){
+            when {expression {parms.terraform_action == 'apply'}}
+            steps{
+                script {
+                    def plan = readFile 'terraform/03-EKS-project/02-Networking/tfplan.txt'
+                    input message: '[02-Networking] approve to proced'
+                        parameters: [text(name: 'Plan',description: 'terraform plan output', defaultValue: plan)]
+                }
+            }
+        }
+
+        stage('Creation: 02-Networking'){
+              when {expression {parms.terraform_action == 'apply'}}
+              steps{
+                sh'''
+                cd terraform/03-EKS-project/02-Networking
+                terraform apply --input=false tfplan
+                '''
+              }
+        }
+
+        stage('03-EKS'){
+            when {expression {parms.terraform_action == 'apply'}}
+            steps{
+                sh '''
+                cd terraform/03-EKS-project/03-EKS
+                terraform init --input=false          
+                terraform import aws_s3_bucket.tf_state shab-terraform-backup || true
+                terraform plan -out tfplan
+                terraform show -no-color tfplan > tfplan.txt
+                '''
+            }
+        }
+
+        stage('approval:03-EKS'){
+            when {expression {parms.terraform_action == 'apply'}}
+            steps{
+                script {
+                    def plan = readFile 'terraform/03-EKS-project/03-EKS/tfplan.txt'
+                    input message: '[03-EKS] approve to proced'
+                        parameters: [text(name: 'Plan',description: 'terraform plan output', defaultValue: plan)]
+                }
+            }
+        }
+
+        stage('Creation: 03-EKS'){
+            when {expression {parms.terraform_action == 'apply'}}
+              steps{
+                sh'''
+                cd terraform/03-EKS-project/03-EKS
+                terraform apply --input=false tfplan
+                '''
+              }
+        }
+
+// --destroy stage
+
+        stage('Destroying EKS'){
+            when {expression {parms.terraform_action == 'destroy'}}
+            steps {
+                sh '''
+                   cd terraform/03-EKS-project/03-EKS/
+                   terraform init --input=false
+                   terraform destroy -auto-aprove
+                '''
+            }
+        }
+        stage('Destroying network'){
+            when {expression {parms.terraform_action == 'destroy'}}
+            steps {
+                sh '''
+                   cd terraform/03-EKS-project/02-Networking
+                   terraform init --input=false
+                   terraform destroy -auto-aprove
+                '''
+            }
+        }
+        stage('Destroying bootstrap'){
+            when {expression {parms.terraform_action == 'destroy'}}
+            steps {
+                sh '''
+                   cd terraform/03-EKS-project/01-Bootstrap
+                   terraform init --input=false
+                   terraform destroy -auto-aprove
+                '''
+            }
+        }
+
+
+    }
+
+}
