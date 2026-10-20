@@ -3,6 +3,6 @@ data "terraform_remote_state" "networking" {
   config = {
         bucket = "shab-terraform-backup"
         key = "networking/terraform.tfstate"
-        region = "ap-northeast-1"
+        region = "us-east-2"
   }
 }
