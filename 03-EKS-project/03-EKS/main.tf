@@ -1,9 +1,9 @@
-locals {
-    vpc_id = data.terraform_remote_state.networking.outputs.vpc_id
-    private_subnet_ids = data.terraform_remote_state.networking.outputs.private_subnet_ids
-    public_subnet_ids = data.terraform_remote_state.networking.outputs.public_subnet_ids
-}
 
+locals {
+  vpc_id             = data.terraform_remote_state.networking.outputs.vpc_id
+  private_subnet_ids = data.terraform_remote_state.networking.outputs.private_subnet_ids
+  public_subnet_ids  = data.terraform_remote_state.networking.outputs.public_subnet_ids
+}
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
@@ -12,13 +12,19 @@ module "eks" {
   name               = "shab-eks-cluster"
   kubernetes_version = "1.33"
 
+  # Disable IRSA/OIDC provider creation to avoid AWS SCP restriction
+  enable_irsa = false
+
   addons = {
-    coredns                = {}
+    coredns = {}
+
     eks-pod-identity-agent = {
       before_compute = true
     }
-    kube-proxy             = {}
-    vpc-cni                = {
+
+    kube-proxy = {}
+
+    vpc-cni = {
       before_compute = true
     }
   }
@@ -26,17 +32,16 @@ module "eks" {
   # Optional
   endpoint_public_access = true
 
-  # Optional: Adds the current caller identity as an administrator via cluster access entry
+  # Adds the current caller identity as a cluster administrator
   enable_cluster_creator_admin_permissions = true
 
   vpc_id                   = local.vpc_id
   subnet_ids               = local.private_subnet_ids
   control_plane_subnet_ids = local.public_subnet_ids
 
-  # EKS Managed Node Group(s)
+  # EKS Managed Node Groups
   eks_managed_node_groups = {
     example = {
-      # Starting on 1.30, AL2023 is the default AMI type for EKS managed node groups
       ami_type       = "AL2023_x86_64_STANDARD"
       instance_types = ["m7i-flex.large"]
 
